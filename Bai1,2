@@ -1,0 +1,209 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+namespace SapXep
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            Student[] students = new Student[5];
+            students[0] = new Student("Nguyễn Văn A", "Hà Nội", new DateTime(2000, 1, 1), "SV001", 3.5f);
+            students[1] = new Student("Trần Thị B", "Hồ Chí Minh", new DateTime(1999, 2, 2), "SV002", 3.9f);
+            students[2] = new Student("Lê Văn C", "Đà Nẵng", new DateTime(2001, 3, 3), "SV003", 3.2f);
+            students[3] = new Student("Phạm Thị D", "Vũng Tàu", new DateTime(2000, 4, 4), "SV004", 3.8f);
+            students[4] = new Student("Hoàng Văn E", "Cần Thơ", new DateTime(1998, 5, 5), "SV005", 3.7f);
+
+            var sortedStudents = students.OrderByDescending(s => s.gpa).ToArray();
+
+            // In ra danh sách sinh viên
+            Console.WriteLine("Danh sách sinh viên theo thứ tự giảm dần của GPA:\n");
+            foreach (var student in sortedStudents)
+            {
+                student.printStudent();
+            }
+
+            Console.ReadLine();
+        }
+    }
+
+    //Lớp Human
+    class Human
+    {
+        public string name { get; set; }
+        public string placeofbirth { get; set; }
+        public DateTime birthday { get; set; }
+
+        public Human(string name, string placeofbirth, DateTime birthday)
+        {
+            this.name = name;
+            this.placeofbirth = placeofbirth;
+            this.birthday = birthday;
+        }
+    }
+
+    //Lớp Student kế thừa Human
+    class Student : Human
+    {
+        public string id { get; set; }
+        public float gpa { get; set; }
+
+        public Student(string name, string placeofbirth, DateTime birthday, string id, float gpa) : base(name, placeofbirth, birthday)
+        {
+            this.id = id;
+            this.gpa = gpa;
+        }
+
+        public void printStudent()
+        {
+            Console.WriteLine($"ID: {this.id}\t GPA: {this.gpa}\t Họ tên: {this.name}\t Nơi sinh: {this.placeofbirth}\t Ngày sinh: {this.birthday}");
+        }
+    }
+}
+
+namespace Vector
+{
+    abstract class Vector
+    {
+        public abstract void showInfo();
+        public abstract Vector Sum(Vector other);
+        public abstract bool Orth(Vector other);
+    }
+    class Vector2D : Vector
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public Vector2D(double x, double y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+        public override void showInfo()
+        {
+            Console.WriteLine($"Vector 2D: ({X}, {Y})");
+        }
+        public override Vector Sum(Vector other)
+        {
+            if (other is Vector2D order2D)
+            {
+                return new Vector2D(this.X + order2D.X, this.Y + order2D.Y);
+            }
+            throw new ArgumentException();
+        }
+        public override bool Orth(Vector other)
+        {
+            if (other is Vector2D order2D)
+                return (this.X * order2D.X + this.Y * order2D.Y) == 0;
+            throw new ArgumentException();
+        }
+    }
+    class Vector3D : Vector
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+        public Vector3D(double x, double y, double z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+        public override void showInfo()
+        {
+            Console.WriteLine($"Vector 3D: ({X}, {Y}, {Z})");
+        }
+        public override Vector Sum(Vector other)
+        {
+            if (other is Vector3D order3D)
+            {
+                return new Vector3D(this.X + order3D.X, this.Y + order3D.Y, this.Z + order3D.Z);
+            }
+            throw new ArgumentException();
+        }
+        public override bool Orth(Vector other)
+        {
+            if (other is Vector3D order3D)
+                return (this.X * order3D.X + this.Y * order3D.Y + this.Z * order3D.Z) == 0;
+            throw new ArgumentException();
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            Random random = new Random();
+            Vector[] vectors = new Vector[10];
+
+            // Tạo ngẫu nhiên 10 Vector2D hoặc Vector3D
+            for (int i = 0; i < vectors.Length; i++)
+            {
+                if (random.Next(2) == 0)
+                {
+                    vectors[i] = new Vector2D(random.Next(-10, 10), random.Next(-10, 10));
+                }
+
+                else
+                {
+                    vectors[i] = new Vector3D(random.Next(-10, 10), random.Next(-10, 10), random.Next(-10, 10));
+                }
+            }
+
+            // Hiển thị thông tin của các vector
+            foreach (var vector in vectors)
+            {
+                vector.showInfo();
+            }
+
+            // Cộng và kiểm tra tính trực giao cho các vector cùng loại
+            for (int i = 0; i < vectors.Length - 1; i++)
+            {
+                for (int j = i + 1; j < vectors.Length; j++)
+                {
+                    if (vectors[i] is Vector2D && vectors[j] is Vector2D)
+                    {
+                        Vector sum = vectors[i].Sum(vectors[j]);
+                        Console.Write($"\nTổng Vector {i + 1} và {j + 1}: ");
+                        sum.showInfo();
+
+                        bool orth = vectors[i].Orth(vectors[j]);
+                        if (orth == true)
+                        {
+                            Console.WriteLine("Cặp Vector2D này trực giao\n");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Cặp Vector2D này không trực giao\n");
+                        }
+                    }
+
+                    if (vectors[i] is Vector3D && vectors[j] is Vector3D)
+                    {
+                        Vector sum = vectors[i].Sum(vectors[j]);
+                        Console.Write($"\nTổng Vector {i + 1} và {j + 1}: ");
+                        sum.showInfo();
+
+                        bool orth = vectors[i].Orth(vectors[j]);
+                        if (orth == true)
+                        {
+                            Console.WriteLine("Cặp Vector3D này trực giao\n");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Cặp Vector3D này không trực giao\n");
+                        }
+                    }
+                }
+            }
+
+            Console.ReadLine();
+        }
+    }
+}
